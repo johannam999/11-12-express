@@ -1,77 +1,102 @@
 'use strict';
 
-const server = require('../lib/server');
-const superagent = require('superagent');
+import faker from 'faker';
+import superagent from 'superagent';
+import Box from '../model/box';
+import { startServer, stopServer } from '../lib/server';
 
-const testPort = 5000;
-const mockResource = { name: 'test name', content: 'test content' };
-let mockId = null;
+const apiURL = `http://localhost:${process.env.PORT}/api/boxes`;
 
-beforeAll(() => server.start(testPort));
-afterAll(() => server.stop());
+const createMockBox = () => {
+  return new Box({
+    firstName: faker.lorem.words(10),
+    lastName: faker.lorem.words(25),
+    address: faker.lorem.words(40),
+  }).save();
+};
 
-describe('VALID request to the API', () => {
-  describe('POST /api/v1/box', () => {
-    it('should respond with status 201 and created a new box', () => {
-      return superagent.post(`:${testPort}/api/v1/box`)
-        .send(mockResource)
-        .then((res) => {
-          mockId = res.body.id;
-          expect(res.body.name).toEqual(mockResource.name);
-          expect(res.body.content).toEqual(mockResource.content);
-          expect(res.status).toEqual(201);
+describe('api/boxes', () => {
+  beforeAll(startServer);// this is a function but not envoking function
+  afterAll(stopServer);
+  afterEach(() => Box.remove({})); 
+
+  test('POST - it should respond with a 200 status', () => {
+    const boxToPost = {
+      firstName: faker.lorem.words(10),
+      lastName: faker.lorem.words(25),
+      address: faker.lorem.words(40),
+    };
+    return superagent.post(apiURL)
+      .send(boxToPost)
+      .then((response) => {
+        expect(response.status).toEqual(200);
+        expect(response.body.firstName).toEqual(boxToPost.firstName); 
+        expect(response.body.lastName).toEqual(boxToPost.lastName);
+        expect(response.body.address).toEqual(boxToPost.address);
+        expect(response.body._id).toBeTruthy();
+        expect(response.body.timestamp).toBeTruthy();
+      });
+  });
+  test('POST - It should respond with a 400 status if no firstName', () => {
+    const boxToPost = {
+      firstName: faker.lorem.words(25),
+    };
+    return superagent.post(apiURL)
+      .send(boxToPost)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status).toEqual(400);
+      });
+  });
+  test('POST - It should respond with a 400 status if no lastName ', () => {
+    const boxToPost = {
+      lastName: faker.lorem.words(25),
+    };
+    return superagent.post(apiURL)
+      .send(boxToPost)
+      .then(Promise.reject)
+      .catch((response) => {
+        expect(response.status).toEqual(400);
+      });
+  });
+  describe('GET /api/boxes', () => {
+    test('should respond with 200 if there are no errors', () => {
+      let boxToTest = null; 
+      return createMockBox()
+        .then((box) => {
+          boxToTest = box;
+          return superagent.get(`${apiURL}/${box._id}`);
+        })
+        .then((response) => {
+          expect(response.status).toEqual(200);
+          expect(response.body.firstName).toEqual(boxToTest.firstName);
+          expect(response.body.lastName).toEqual(boxToTest.lastName);
+          expect(response.body.address).toEqual(boxToTest.address);
+        });
+    });
+    test('should respond with 404 if there is no box to be found', () => {
+      return superagent.get(`${apiURL}/ThisIsAnInvalidId`)
+        .then(Promise.reject)
+        .catch((response) => {
+          expect(response.status).toEqual(404);
         });
     });
   });
-
-  describe('GET /api/v1/box', () => {
-    it('should respond with the a previously created box', () => {
-      return superagent.get(`:${testPort}/api/v1/box?id=${mockId}`)
-        .then((res) => {
-          expect(res.body.name).toEqual(mockResource.name);
-          expect(res.body.content).toEqual(mockResource.content);
-          expect(res.status).toEqual(200);
-        });
-    });
-  });
-  describe('DELETE /api/box', () => {
-    it('should respond with status 204 delete the box data', () => {
-      return superagent.delete(`:${testPort}/api/v1/box?id=${mockId}`)
-        .then((res) => {
-          expect(res.body).toEqual({});
-        });
-    });
-  }); 
 });
+// describe('DELETE /api/boxes/:id', () => {
+//   test('should respond with 200 if there are no errors', () => {
+//     let boxToTest = null; 
+//     return createMockBox()
+//       .then((box) => {
+//         boxToTest = box;
+//         return superagent.get(`${apiURL}/${box._id}`);
+//       })
+//       .then((response) => {
+//         expect(response.status).toEqual(200);
+//         expect(response.body.firstName).toEqual([]);
+//         expect(response.body.lastName).toEqual([]);
+//         expect(response.body.address).toEqual([]);
+//       });
+//   });
+// });
 
-describe('INVALID request', () => {
-  describe('GET /api/v1/box', () => {
-    it('should err out with 404 status code when id not found', () => {
-      return superagent.get(`:${testPort}/api/v1/box?id=kolory`)
-        .query({})
-        .catch((err) => {
-          expect(err.status).toEqual(404);
-          expect(err).toBeTruthy();
-        });
-    });
-  });
-  describe('GET /api/v1/box box', () => {
-    it('should err out with 400 status code when no id provided', () => {
-      return superagent.get(`:${testPort}/api/v1/box?id=`)
-        .query({})
-        .catch((err) => {
-          expect(err.status).toEqual(400);
-          expect(err).toBeTruthy();
-        });
-    });
-  });
- 
-  describe('DELETE /api/v1/box', () => {
-    it('should respond with status 404 delete the box data', () => {
-      return superagent.delete(`:${testPort}/api/v1/box?id=3`)
-        .catch((err) => {
-          expect(err.status).toEqual(404);
-        });
-    });
-  });
-});

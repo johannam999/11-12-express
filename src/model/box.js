@@ -1,15 +1,27 @@
-'use strict';
+import mongoose from 'mongoose';
 
-const uuid = require('uuid/v4');
-const logger = require('../lib/logger');
 
-module.exports = class {
-  constructor(name, content) {
-    if (!name || !content) throw new Error('POST request requires name and content');
-    this.name = name;
-    this.content = content;
-    this.id = uuid();
-    logger.log(logger.INFO, `NOTE: Created a new box: ${JSON.stringify(this)}`);
-  }
-};
+const boxSchema = mongoose.Schema({
+  firstName: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  address: {
+    type: String,
+    minlength: 15,
+  },
+ 
+  timestamp: {
+    type: Date,
+    default: () => new Date(),
+  },
+});
+
+export default mongoose.model('box', boxSchema);
 

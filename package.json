@@ -1,8 +1,4 @@
 {
-  "name": "08-vanilla-rest-api",
-  "version": "1.0.0",
-  "description": "![cf](https://i.imgur.com/7v5ASc8.png) Lab 08: Vanilla REST API ======",
-  "main": "index.js",
   "scripts": {
     "test": "jest --coverage",
     "watchAll": "jest --coverage --watchAll",
@@ -14,17 +10,6 @@
       "<rootDir>/src/__test__/lib/test.env.js"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/johannam999/08-vanilla-rest-api.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/johannam999/08-vanilla-rest-api/issues"
-  },
-  "homepage": "https://github.com/johannam999/08-vanilla-rest-api#readme",
   "devDependencies": {
     "babel-eslint": "^8.2.3",
     "babel-preset-env": "^1.6.1",
@@ -39,8 +24,10 @@
   },
   "dependencies": {
     "body": "^5.1.0",
+    "body-parser": "^1.18.2",
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
+    "faker": "^4.1.0",
     "mongoose": "^5.0.17",
     "parser": "^0.1.4",
     "uuid": "^3.2.1",
