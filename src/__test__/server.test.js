@@ -7,7 +7,7 @@ import { startServer, stopServer } from '../lib/server';
 
 const apiURL = `http://localhost:${process.env.PORT}/api/boxes`;
 
-const createMockBox = () => {
+const pCreateMockBox = () => {
   return new Box({
     firstName: faker.lorem.words(10),
     lastName: faker.lorem.words(25),
@@ -62,7 +62,7 @@ describe('api/boxes', () => {
   describe('GET /api/boxes', () => {
     test('should respond with 200 if there are no errors', () => {
       let boxToTest = null; 
-      return createMockBox()
+      return pCreateMockBox()
         .then((box) => {
           boxToTest = box;
           return superagent.get(`${apiURL}/${box._id}`);
@@ -82,21 +82,36 @@ describe('api/boxes', () => {
         });
     });
   });
-});
-// describe('DELETE /api/boxes/:id', () => {
-//   test('should respond with 200 if there are no errors', () => {
-//     let boxToTest = null; 
-//     return createMockBox()
-//       .then((box) => {
-//         boxToTest = box;
-//         return superagent.get(`${apiURL}/${box._id}`);
-//       })
-//       .then((response) => {
-//         expect(response.status).toEqual(200);
-//         expect(response.body.firstName).toEqual([]);
-//         expect(response.body.lastName).toEqual([]);
-//         expect(response.body.address).toEqual([]);
-//       });
-//   });
-// });
 
+  describe('PUT /api/boxes', () => {
+    test('should update a box and return a 200 status code', () => {
+      let boxToUpdate = null;
+      return pCreateMockBox()
+        .then((boxMock) => {
+          boxToUpdate = boxMock;
+          return superagent.put(`${apiURL}/${boxMock._id}`)
+            .send({ firstName: 'this is Joanna' });
+        })
+        .then((response) => {
+          expect(response.status).toEqual(200);
+          expect(response.body.firstName).toEqual('this is Joanna');
+          expect(response.body.lastName).toEqual(boxToUpdate.lastName);
+          expect(response.body.address).toEqual(boxToUpdate.address);
+          expect(response.body._id).toEqual(boxToUpdate._id.toString());
+        });
+    });
+  });
+
+  describe('DELETE /api/boxes/:id', () => {
+    test('should respond with 200 if there are no errors', () => {
+      return pCreateMockBox() 
+        .then((box) => {
+          return superagent.delete(`${apiURL}/${box._id}`);
+        })
+        .then((response) => {
+          expect(response.status).toEqual(204);
+          expect(response.body).toEqual({});
+        });
+    });
+  });
+});
