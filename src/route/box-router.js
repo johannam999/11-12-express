@@ -58,7 +58,7 @@ boxRouter.get('/api/boxes/:id', (request, response) => {
 boxRouter.delete('/api/boxes/:id', (request, response) => {
   logger.log(logger.INFO, 'DELETE - processing a request');
 
-  return Box.findById(request.params.id)
+  return Box.findByIdAndRemove(request.params.id)
     .then((box) => { 
       if (!box) {
         logger.log(logger.INFO, 'DELETE - responding with a 404 status code - (!box)');
@@ -73,7 +73,9 @@ boxRouter.delete('/api/boxes/:id', (request, response) => {
         logger.log(logger.VERBOSE, `Could not parse the specific object id ${request.params.id}`);
         return response.sendStatus(400);
       }
-      return undefined;
+      logger.log(logger.ERROR, '__GET_ERROR__ Returning a 500 status code');
+      logger.log(logger.ERROR, error);
+      return response.sendStatus(500);
     });
 });
 
