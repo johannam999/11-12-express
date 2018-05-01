@@ -2,11 +2,11 @@
 
 const winston = require('winston');
 
-const logger = module.exports = winston.createLogger({
+const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: 'log.log', level: 'verbose' }),
+    new winston.transports.File({ filename: `${new Date().toDateString().replace(/ /g, ' ')}.log`, level: 'verbose' }),
     new winston.transports.Console({ format: winston.format.simple(), level: 'info' }),
   ],
 });
@@ -14,3 +14,5 @@ const logger = module.exports = winston.createLogger({
 logger.INFO = 'info';
 logger.ERROR = 'error';
 logger.VERBOSE = 'verbose';
+
+export default logger;
