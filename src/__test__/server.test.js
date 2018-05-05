@@ -12,13 +12,13 @@ const pCreateMockBox = () => {
     firstName: faker.lorem.words(10),
     lastName: faker.lorem.words(25),
     address: faker.lorem.words(40),
-  }).save();
+  }).save();// i get promise back a saved item
 };
 
 describe('api/boxes', () => {
   beforeAll(startServer);// this is a function but not envoking function
   afterAll(stopServer);
-  afterEach(() => Box.remove({})); 
+  afterEach(() => Box.remove({})); // delete database after testing done
 
   test('POST - it should respond with a 200 status', () => {
     const boxToPost = {

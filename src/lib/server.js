@@ -33,7 +33,7 @@ const stopServer = () => { // this is a PROMISE
   return mongoose.disconnect() //  bc we have no control over how long it will take to shut down
     .then(() => {
       server.close(() => {
-        logger.log(logger.INFO, 'Server is off');
+        logger.log(logger.INFO, 'Server is off'); // we can add json.strigify here to see the error
       });
     });
 };

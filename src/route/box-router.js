@@ -3,7 +3,7 @@
 import { Router } from 'express';
 import bodyParser from 'body-parser';
 import HttpErrors from 'http-errors';
-import Box from '../model/box';
+import Box from '../model/box'; // we imported Box which is a Schema in mongoose so if we import we use mongoose
 import logger from '../lib/logger';
 
 const jsonParser = bodyParser.json();
@@ -30,7 +30,7 @@ boxRouter.put('/api/boxes/:id', jsonParser, (request, response, next) => {
     .then((updatedBox) => {
       if (!updatedBox) {
         logger.log(logger.INFO, 'PUT responding with 404 status code');
-        return next(new HttpErrors(404, 'note not found'));
+        return next(new HttpErrors(404, 'box not found'));
       }
       logger.log(logger.INFO, 'PUT -  responding with a 200 status code');
       return response.json(updatedBox);
@@ -44,7 +44,7 @@ boxRouter.get('/api/boxes/:id', (request, response, next) => {
     .then((box) => { 
       if (!box) {
         logger.log(logger.INFO, 'GET - responding with a 404 status code - (!box)');
-        return next(new HttpErrors(404, 'note not found'));
+        return next(new HttpErrors(404, 'box not found'));
       }
       logger.log(logger.INFO, 'GET - responding with a 200 status code');
       return response.json(box);
@@ -57,7 +57,7 @@ boxRouter.delete('/api/boxes/:id', (request, response, next) => {
     .then((box) => { 
       if (!box) {
         logger.log(logger.INFO, 'DELETE - responding with a 404 status code - (!box)');
-        return next(new HttpErrors(404, 'note not found'));
+        return next(new HttpErrors(404, 'box not found'));
       }
       logger.log(logger.INFO, 'DELETE - responding with a 204 status code');
       return response.sendStatus(204);
